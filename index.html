@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnackSure 零食保險販賣機 | 微保險生活急救站</title>
+  <!-- Google Fonts: Inter & Outfit & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;600;800;900&family=VT323&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-cream: #FFF9ED;
+      --machine-red: #FF4757;
+      --machine-red-dark: #D63031;
+      --machine-cyan: #2ED573;
+      --machine-yellow: #FFA502;
+      --machine-blue: #1E90FF;
+      --machine-purple: #70A1FF;
+      --retro-navy: #1E272E;
+      --led-green: #2ecc71;
+      --led-bg: #0b1d10;
+      --border-dark: #2C3E50;
+      --shadow-solid: 4px 4px 0px #1E272E;
+      --shadow-solid-lg: 8px 8px 0px #1E272E;
+      --card-radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      background-image: radial-gradient(#FFD29D 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--retro-navy);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px 60px;
+    }
+
+    /* 頂部導航與標題 */
+    header {
+      text-align: center;
+      max-width: 900px;
+      margin-bottom: 24px;
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .badge-vibe {
+      display: inline-block;
+      background: var(--machine-yellow);
+      border: 3px solid var(--border-dark);
+      padding: 4px 16px;
+      border-radius: 99px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      box-shadow: 2px 2px 0 var(--border-dark);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: var(--machine-red-dark);
+      text-shadow: 3px 3px 0 #FFD29D, 5px 5px 0 var(--border-dark);
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #57606f;
+      background: rgba(255, 255, 255, 0.85);
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 2px dashed #a4b0be;
+    }
+
+    /* 主要版面：雙欄設計（販賣機機台 + 功能控制台） */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      max-width: 1200px;
+      width: 100%;
+      align-items: center;
+    }
+
+    @media (min-width: 1024px) {
+      .app-container {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+      }
+    }
+
+    /* =================== 實體感販賣機主體 =================== */
+    .vending-machine {
+      width: 100%;
+      max-width: 440px;
+      background: var(--machine-red);
+      border: 5px solid var(--border-dark);
+      border-radius: 36px 36px 20px 20px;
+      box-shadow: var(--shadow-solid-lg);
+      padding: 24px 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 頂部雨棚裝飾與招牌 */
+    .machine-header {
+      background: #FFFFFF;
+      border: 4px solid var(--border-dark);
+      border-radius: 18px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: inset 0 -4px 0 #f1f2f6;
+    }
+
+    .machine-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      font-size: 1.3rem;
+      color: var(--machine-red-dark);
+    }
+
+    .audio-toggle {
+      background: var(--machine-yellow);
+      border: 2px solid var(--border-dark);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 0 var(--border-dark);
+      transition: transform 0.1s;
+    }
+    .audio-toggle:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+    /* 販賣機玻璃展示櫃 */
+    .showcase-window {
+      background: linear-gradient(180deg, #F0F9FF 0%, #E0F2FE 100%);
+      border: 4px solid var(--border-dark);
+      border-radius: 20px;
+      padding: 16px 12px;
+      position: relative;
+      box-shadow: inset 0 8px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    /* 玻璃反光線條 */
+    .showcase-window::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 10%;
+      width: 40px;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: rotate(35deg);
+      pointer-events: none;
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* 零食展示卡 */
+    .snack-slot {
+      background: white;
+      border: 3px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 10px 8px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #cbd5e1;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+
+    .snack-slot:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 0 #94a3b8;
+      border-color: #000;
+    }
+
+    .snack-slot:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 #cbd5e1;
+    }
+
+    .snack-slot.selected {
+      background: #FEF08A;
+      border-color: #E11D48;
+      animation: pulseSlot 1s infinite alternate;
+    }
+
+    @keyframes pulseSlot {
+      0% { box-shadow: 0 4px 0 #E11D48; }
+      100% { box-shadow: 0 7px 10px rgba(225, 29, 72, 0.4); }
+    }
+
+    .slot-code {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: var(--border-dark);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    .slot-icon {
+      font-size: 2.8rem;
+      margin: 8px 0 4px;
+      filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.1));
+      transition: transform 0.2s;
+    }
+
+    .snack-slot:hover .slot-icon {
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+    .slot-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--retro-navy);
+      line-height: 1.2;
+    }
+
+    .slot-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #e67e22;
+      margin-top: 2px;
+    }
+
+    .slot-price {
+      background: #2ed573;
+      color: #0b1d10;
+      font-weight: 900;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      padding: 2px 8px;
+      margin-top: 6px;
+      border: 1.5px solid var(--border-dark);
+    }
+
+    /* 貨架鐵絲欄杆裝飾 */
+    .shelf-guard {
+      position: absolute;
+      bottom: -6px;
+      left: 10%;
+      right: 10%;
+      height: 4px;
+      background: #94a3b8;
+      border-radius: 2px;
+    }
+
+    /* 販賣機控制面板 (LED + 投幣孔 + 實體鍵盤) */
+    .control-panel {
+      background: #F1F2F6;
+      border: 4px solid var(--border-dark);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* 經典復古綠色 LED 螢幕 */
+    .led-display {
+      background: var(--led-bg);
+      border: 3px solid #000;
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    .led-text {
+      font-family: 'VT323', monospace;
+      color: var(--led-green);
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px rgba(46, 204, 113, 0.7);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .led-balance {
+      font-family: 'VT323', monospace;
+      color: #f1c40f;
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      text-shadow: 0 0 8px rgba(241, 196, 15, 0.7);
+    }
+
+    /* 面板交互區：投幣 + 實體數字盤 */
+    .panel-interactive {
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .coin-slot-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .coin-btn {
+      background: #f5cd79;
+      border: 3px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--border-dark);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.1s;
+    }
+
+    .coin-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+    .coin-slot-visual {
+      width: 50px;
+      height: 10px;
+      background: #1e272e;
+      border-radius: 4px;
+      border: 2px solid #747d8c;
+      box-shadow: inset 0 2px 4px black;
+    }
+
+    /* 實體微動開關小鍵盤 */
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      flex-grow: 1;
+    }
+
+    .key-btn {
+      background: #FFFFFF;
+      border: 2.5px solid var(--border-dark);
+      border-radius: 8px;
+      padding: 7px 0;
+      font-size: 0.95rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--border-dark);
+      transition: all 0.1s;
+      text-align: center;
+    }
+
+    .key-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+      background: #dfe4ea;
+    }
+
+    .key-btn.action-enter {
+      background: #2ed573;
+      color: #0b1d10;
+    }
+
+    .key-btn.action-clear {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    /* 下方彈跳式取貨口 (Pickup Door) */
+    .pickup-area {
+      background: #2C3E50;
+      border: 4px solid var(--border-dark);
+      border-radius: 16px;
+      height: 90px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: inset 0 8px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .pickup-door {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, #34495e 0%, #1e272e 100%);
+      border-bottom: 4px solid #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 5;
+    }
+
+    .pickup-door::after {
+      content: 'PUSH 取貨口 ▾';
+      font-weight: 900;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: #95a5a6;
+      border: 2px dashed #7f8c8d;
+      padding: 4px 14px;
+      border-radius: 6px;
+    }
+
+    .pickup-door.open {
+      transform: translateY(-80%);
+    }
+
+    /* 掉落中的商品物品 (動畫元件) */
+    .dropped-snack {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: #ffeaa7;
+      padding: 8px 16px;
+      border: 3px solid var(--border-dark);
+      border-radius: 12px;
+      box-shadow: 2px 2px 0 var(--border-dark);
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--retro-navy);
+      z-index: 4;
+      cursor: pointer;
+      animation: bounce 0.6s infinite alternate;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-6px); }
+    }
+
+    /* =================== 右側控制與功能面板 (Vibe Hub) =================== */
+    .vibe-hub {
+      flex: 1;
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 模式切換與亮點功能導覽條 */
+    .feature-tabs {
+      display: flex;
+      gap: 10px;
+      background: white;
+      padding: 6px;
+      border: 3px solid var(--border-dark);
+      border-radius: 16px;
+      box-shadow: var(--shadow-solid);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #57606f;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: var(--machine-red);
+      color: white;
+      box-shadow: 2px 2px 0 var(--border-dark);
+    }
+
+    /* 卡片容器共通樣式 */
+    .hub-card {
+      background: white;
+      border: 4px solid var(--border-dark);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-solid);
+      padding: 22px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .hub-title {
+      font-size: 1.3rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      color: var(--retro-navy);
+    }
+
+    /* 1. 當前挑選商品與營養標籤（保險條款簡化版） */
+    .nutrition-box {
+      border: 3px solid var(--border-dark);
+      border-radius: 14px;
+      background: #FCFDFD;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .nutrition-header {
+      border-bottom: 8px solid var(--border-dark);
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .nutrition-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .nutrition-subtitle {
+      font-size: 0.85rem;
+      color: #636e72;
+      font-weight: 700;
+    }
+
+    .nutrition-calories-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 4px solid var(--border-dark);
+      padding: 8px 0;
+      margin-bottom: 8px;
+    }
+
+    .nutrition-calorie-num {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--machine-red);
+    }
+
+    .nutrition-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #dfe6e9;
+      font-size: 0.95rem;
+    }
+    .nutrition-row.bold {
+      font-weight: 800;
+    }
+
+    /* 客製化調味加料選項 */
+    .custom-seasoning {
+      margin-top: 16px;
+    }
+    .section-label {
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .seasoning-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .seasoning-pill {
+      border: 2px solid var(--border-dark);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      background: #f8fafc;
+      transition: all 0.15s;
+    }
+
+    .seasoning-pill.active {
+      background: #dcfce7;
+      border-color: #16a34a;
+      box-shadow: 2px 2px 0 #16a34a;
+      font-weight: 800;
+    }
+
+    /* 份量大小 (保障期間) */
+    .duration-chips {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .duration-chip {
+      flex: 1;
+      text-align: center;
+      padding: 8px 4px;
+      border: 2px solid var(--border-dark);
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: white;
+      transition: all 0.15s;
+    }
+
+    .duration-chip.active {
+      background: var(--machine-blue);
+      color: white;
+      box-shadow: 2px 2px 0 var(--border-dark);
+    }
+
+    /* 真實零食加購方案 (Bundling) */
+    .bundle-box {
+      background: #FFF7ED;
+      border: 2px dashed #F97316;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    /* 投保人名義輸入 */
+    .holder-input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .holder-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2.5px solid var(--border-dark);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      outline: none;
+    }
+    .holder-input:focus {
+      border-color: var(--machine-blue);
+    }
+
+    /* 下單按鈕 */
+    .btn-buy-snack {
+      width: 100%;
+      background: var(--machine-red);
+      color: white;
+      border: 3.5px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: var(--shadow-solid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .btn-buy-snack:hover {
+      background: #ff5252;
+    }
+
+    .btn-buy-snack:active {
+      transform: translate(3px, 3px);
+      box-shadow: none;
+    }
+
+    /* 2. AI 推薦師測驗 (Quiz View) */
+    .quiz-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .quiz-question {
+      background: #F8FAFC;
+      border: 2px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .quiz-q-title {
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #1e293b;
+    }
+
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    @media (min-width: 600px) {
+      .quiz-options {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .quiz-opt-btn {
+      background: white;
+      border: 2px solid #cbd5e1;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .quiz-opt-btn:hover {
+      border-color: var(--border-dark);
+      background: #f1f5f9;
+    }
+
+    .quiz-opt-btn.selected {
+      background: #fef08a;
+      border-color: #ca8a04;
+      box-shadow: 2px 2px 0 #ca8a04;
+    }
+
+    /* 3. 幸運盲盒扭蛋區 (Gacha View) */
+    .gacha-machine-area {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .gacha-sphere {
+      font-size: 5rem;
+      display: inline-block;
+      animation: float 2s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .btn-gacha-spin {
+      background: var(--machine-yellow);
+      border: 3.5px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: var(--shadow-solid);
+      margin-top: 14px;
+    }
+
+    .btn-gacha-spin:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+    /* =================== 開箱彈窗：數位保單零食包 (Policy Modal) =================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .policy-card {
+      background: white;
+      border: 5px solid var(--border-dark);
+      border-radius: 28px;
+      max-width: 440px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: var(--shadow-solid-lg);
+      position: relative;
+      animation: popScale 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popScale {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .policy-stamp {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      border: 3px dashed #16a34a;
+      color: #16a34a;
+      font-weight: 900;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: 8px;
+      transform: rotate(12deg);
+    }
+
+    .policy-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .policy-icon-badge {
+      font-size: 3rem;
+      background: #FEF3C7;
+      border: 2px solid var(--border-dark);
+      border-radius: 16px;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .policy-meta-row {
+      background: #F8FAFC;
+      border: 2px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .policy-coverage-list {
+      background: #EFF6FF;
+      border: 2px solid #BFDBFE;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 18px;
+    }
+
+    .policy-coverage-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #1E3A8A;
+      margin-bottom: 4px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border: 3px solid var(--border-dark);
+      border-radius: 12px;
+      font-weight: 900;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 2px 2px 0 var(--border-dark);
+      transition: all 0.1s;
+    }
+    .modal-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+    .modal-btn.primary {
+      background: var(--machine-yellow);
+    }
+
+    .modal-btn.secondary {
+      background: white;
+    }
+
+    /* 浮動提示訊息 (Toast) */
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      background: var(--retro-navy);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      z-index: 200;
+      transform: translateY(100px);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+
+    .toast-msg.show {
+      transform: translateY(0);
+    }
+
+    /* 頁尾說明 */
+    footer {
+      margin-top: 48px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部標題區 -->
+  <header>
+    <div class="badge-vibe">⚡ Vibe Coding Micro-Insurance Project</div>
+    <h1>🍿 SnackSure 零食保險販賣機</h1>
+    <p class="subtitle">誰說保險一定要厚厚幾十頁？投幣選零食，3秒帶走你的隨身微防護！</p>
+  </header>
+
+  <!-- 主架構：左機台 + 右控制 Hub -->
+  <div class="app-container">
+    
+    <!-- =================== 左側：實體販賣機 =================== -->
+    <div class="vending-machine">
+      <!-- 販賣機頂部招牌 -->
+      <div class="machine-header">
+        <div class="machine-brand">
+          <span>🥫</span>
+          <span>SNACK-SURE 3000</span>
+        </div>
+        <button class="audio-toggle" id="audioToggleBtn" title="開關音效">🔊</button>
+      </div>
+
+      <!-- 玻璃陳列展示窗 -->
+      <div class="showcase-window">
+        <div class="items-grid" id="machineGrid">
+          <!-- JS 動態生成 6 款零食保險品項 -->
+        </div>
+        <div class="shelf-guard"></div>
+      </div>
+
+      <!-- 操作面板 (LED 綠屏 + 投幣孔 + 實體小鍵盤) -->
+      <div class="control-panel">
+        <div class="led-display">
+          <div class="led-text" id="ledScreen">READY: A1-C2</div>
+          <div class="led-balance" id="ledWallet">餘額 $100</div>
+        </div>
+
+        <div class="panel-interactive">
+          <div class="coin-slot-wrapper">
+            <button class="coin-btn" id="insertCoinBtn">
+              <span>🪙</span> +$50 投幣
+            </button>
+            <div class="coin-slot-visual" title="硬幣投入孔"></div>
+          </div>
+
+          <!-- 實體鍵盤 -->
+          <div class="keypad-grid">
+            <button class="key-btn" onclick="pressKey('A')">A</button>
+            <button class="key-btn" onclick="pressKey('B')">B</button>
+            <button class="key-btn" onclick="pressKey('C')">C</button>
+            <button class="key-btn action-clear" onclick="pressKey('CLR')">C</button>
+            
+            <button class="key-btn" onclick="pressKey('1')">1</button>
+            <button class="key-btn" onclick="pressKey('2')">2</button>
+            <button class="key-btn action-enter" onclick="pressKey('ENT')">OK</button>
+            <button class="key-btn" onclick="triggerGacha()">🎲</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 取貨口 -->
+      <div class="pickup-area" id="pickupArea" onclick="inspectDroppedItem()">
+        <div class="pickup-door" id="pickupDoor"></div>
+        <div class="dropped-snack" id="droppedItem">
+          <span id="droppedIcon">🍿</span>
+          <span id="droppedText">點擊取出保單零食包！</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== 右側：功能工作台 =================== -->
+    <div class="vibe-hub">
+      
+      <!-- 功能頁籤切換 -->
+      <div class="feature-tabs">
+        <button class="tab-btn active" id="tabDetail" onclick="switchTab('detail')">
+          📋 營養成分與客製 (保單)
+        </button>
+        <button class="tab-btn" id="tabQuiz" onclick="switchTab('quiz')">
+          🤖 AI 零食推薦師
+        </button>
+        <button class="tab-btn" id="tabGacha" onclick="switchTab('gacha')">
+          🎰 幸運盲盒投幣
+        </button>
+      </div>
+
+      <!-- 頁籤內容 1：零食保單詳情與客製化調味加料 -->
+      <div class="hub-card" id="detailPanel">
+        <div class="hub-title">
+          <span>🔬</span>
+          <span id="panelTitle">A1. 洋洋芋片 (洋洋得意險)</span>
+        </div>
+
+        <!-- 營養成分表 (保險條款簡化版) -->
+        <div class="nutrition-box">
+          <div class="nutrition-header">
+            <div class="nutrition-title">防護營養標籤 (Nutrition Facts)</div>
+            <div class="nutrition-subtitle">每份含量包含滿滿安全感與理賠力</div>
+          </div>
+          
+          <div class="nutrition-calories-row">
+            <div>
+              <div style="font-weight: 800; font-size: 0.85rem; color: #64748b;">熱量 (基本每日保費)</div>
+              <div class="nutrition-calorie-num" id="nutriCalories">NT$ 15 / 日</div>
+            </div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #16a34a;">保額充足率 100%</div>
+          </div>
+
+          <div class="nutrition-row bold">
+            <span>核心防護成分 (Ingredients)</span>
+            <span id="nutriIngredient">旅程延誤 & 跌倒防護</span>
+          </div>
+          <div class="nutrition-row">
+            <span>醫療保障限額</span>
+            <span id="nutriMedical">實支實付 NT$ 30,000</span>
+          </div>
+          <div class="nutrition-row">
+            <span>突發事故慰問零用金</span>
+            <span id="nutriBonus">NT$ 5,000 / 次</span>
+          </div>
+          <div class="nutrition-row">
+            <span>理賠反應速度</span>
+            <span id="nutriSpeed">APP 拍照速審 15 分鐘</span>
+          </div>
+        </div>
+
+        <!-- 客製化調味（增加保額/附加條款） -->
+        <div class="custom-seasoning">
+          <div class="section-label">
+            <span>🧂</span> 客製調味 (附加微保險擴充包)
+          </div>
+          <div class="seasoning-grid">
+            <div class="seasoning-pill" id="optSpicy" onclick="toggleSeasoning('spicy')">
+              <span>🌶️ 加辣 (意外保額升級)</span>
+              <span>+$5</span>
+            </div>
+            <div class="seasoning-pill" id="optCheese" onclick="toggleSeasoning('cheese')">
+              <span>🧀 加起司 (不便險加購)</span>
+              <span>+$8</span>
+            </div>
+            <div class="seasoning-pill" id="optGarlic" onclick="toggleSeasoning('garlic')">
+              <span>🧄 加蒜香 (緊急實支實付)</span>
+              <span>+$6</span>
+            </div>
+          </div>
+
+          <!-- 份量選擇 (保障天數) -->
+          <div class="section-label">
+            <span>⏱️</span> 選擇份量 (保障天數與效期)
+          </div>
+          <div class="duration-chips">
+            <div class="duration-chip active" onclick="selectDuration(1, this)">1天 (單日試吃包)</div>
+            <div class="duration-chip" onclick="selectDuration(3, this)">3天 (週末出遊包)</div>
+            <div class="duration-chip" onclick="selectDuration(7, this)">7天 (冒險家庭號)</div>
+          </div>
+
+          <!-- 真實零食加購方案 -->
+          <div class="bundle-box">
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem; color: #9A3412;">
+                🎁 結合真實零食：洋芋片實體兌換券
+              </div>
+              <div style="font-size: 0.8rem; color: #C2410C;">
+                投保成功即贈全家便利商店 5 元折價優惠券
+              </div>
+            </div>
+            <input type="checkbox" id="realSnackBundle" checked style="width: 20px; height: 20px; cursor: pointer;">
+          </div>
+
+          <!-- 投保人名義填寫 -->
+          <div class="holder-input-row">
+            <input type="text" class="holder-input" id="policyHolderName" placeholder="請輸入冒險者大名 (例：王小明 / Alex)" value="快樂旅人">
+          </div>
+
+          <!-- 結帳購買按鈕 -->
+          <button class="btn-buy-snack" onclick="vendCurrentProduct()">
+            <span>🛒 投幣出貨 (合計 NT$ <span id="totalCostSpan">15</span>)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 頁籤內容 2：AI 零食保險推薦師 -->
+      <div class="hub-card" id="quizPanel" style="display: none;">
+        <div class="hub-title">
+          <span>🤖</span>
+          <span>AI 零食保險顧問：3 題測出你今天最需要的防護</span>
+        </div>
+        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 16px;">
+          回答簡單日常情境，AI 演算法將為你配方最合拍的零食微保險組合！
+        </p>
+
+        <div class="quiz-container">
+          <div class="quiz-question">
+            <div class="quiz-q-title">Q1. 你這週末的日常節奏是？</div>
+            <div class="quiz-options">
+              <button class="quiz-opt-btn" onclick="selectQuizOpt(1, 'A1', this)">🚗 衝郊外爬山／海邊露營踏青</button>
+              <button class="quiz-opt-btn" onclick="selectQuizOpt(1, 'B2', this)">💻 咖啡廳或辦公室加班趕進度</button>
+              <button class="quiz-opt-btn" onclick="selectQuizOpt(1, 'B1', this)">🏀 滑板／攀岩／極限高強度運動</button>
+              <button class="quiz-opt-btn" onclick="selectQuizOpt(1, 'C1', this)">🛍️ 市集逛街看展，很怕手滑碎碎平安</button>
+            </div>
+          </div>
+
+          <div class="quiz-question">
+            <div class="quiz-q-title">Q2. 面對未知的意外，你最常浮現的心聲是？</div>
+            <div class="quiz-options">
+              <button class="quiz-opt-btn" onclick="selectQuizOpt(2, 'health', this)">🤧 身體突然小感冒微恙很掃興</button>
+              <button class="quiz-opt-btn" onclick="selectQuizOpt(2, 'delay', this)">⏰ 班機延誤或行程泡湯好焦慮</button>
+              <button class="quiz-opt-btn" onclick="selectQuizOpt(2, 'stress', this)">🤯 壓力山大急需心靈抗壓慰藉</button>
+              <button class="quiz-opt-btn" onclick="selectQuizOpt(2, 'clumsy', this)">💸 打破別人昂貴東西賠不起</button>
+            </div>
+          </div>
+
+          <button class="btn-buy-snack" style="background: var(--machine-blue);" onclick="calculateQuizRecommendation()">
+            ✨ 讓 AI 調配最佳零食保單
+          </button>
+        </div>
+      </div>
+
+      <!-- 頁籤內容 3：幸運盲盒扭蛋模式 -->
+      <div class="hub-card" id="gachaPanel" style="display: none;">
+        <div class="hub-title">
+          <span>🎰</span>
+          <span>命運扭蛋機：隨機盲盒微保險</span>
+        </div>
+        <div class="gacha-machine-area">
+          <div class="gacha-sphere" id="gachaIcon">🔮</div>
+          <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 10px;">今天不知道保什麼？讓命運決定！</h3>
+          <p style="color: #64748b; font-size: 0.9rem; margin-top: 6px;">
+            一律均一價 NT$ 20，隨機開出隱藏款「超奢華防護加料版零食」！
+          </p>
+          <button class="btn-gacha-spin" onclick="triggerGacha()">
+            🎲 投幣 NT$ 20 轉扭蛋盲盒！
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =================== 數位保單開箱彈窗 (Unboxing Modal) =================== -->
+  <div class="modal-overlay" id="policyModal">
+    <div class="policy-card">
+      <div class="policy-stamp">VERIFIED ACTIVE</div>
+      
+      <div class="policy-header">
+        <div class="policy-icon-badge" id="modalBadge">🍿</div>
+        <div>
+          <div style="font-size: 0.8rem; font-weight: 800; color: #64748b;">SNACK-SURE DIGITAL POLICY</div>
+          <h2 style="font-size: 1.4rem; font-weight: 900;" id="modalProductName">洋洋芋片 (洋洋得意險)</h2>
+        </div>
+      </div>
+
+      <div class="policy-meta-row">
+        <div><strong>👤 被保險人：</strong><span id="modalHolder">快樂旅人</span></div>
+        <div><strong>📅 保障效期：</strong><span id="modalDate">即刻起 24 小時內有效</span></div>
+        <div><strong>💰 實付保費：</strong><span id="modalPrice">NT$ 15 (含加料調味)</span></div>
+        <div><strong>🎁 實體贈品：</strong><span id="modalBonusGift">超商 5 元零食折價券兌換碼 #SNACK9988</span></div>
+      </div>
+
+      <div class="policy-coverage-list" id="modalCoverageList">
+        <!-- 保障項目清單動態生成 -->
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn primary" onclick="sharePolicyCard()">📸 IG 卡片分享</button>
+        <button class="modal-btn secondary" onclick="closeModal()">放入零食袋 (完成)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提示 Toast -->
+  <div class="toast-msg" id="toast">歡迎來到 SnackSure 零食保險販賣機！</div>
+
+  <!-- 頁尾 -->
+  <footer>
+    <p>💡 本網站為「Vibe Coding 互動網頁設計專案」創意示範作品。</p>
+    <p>將微保險理念以復古零食販賣機包裝，條款僅為示意，隨時保持探索生活的美好心情！</p>
+  </footer>
+
+  <!-- =================== Vanilla JavaScript & Web Audio API =================== -->
+  <script>
+    /* ================= 1. 商品資料庫 (Snack Lineup) ================= */
+    const SNACK_PRODUCTS = [
+      {
+        id: 'A1',
+        name: '洋洋芋片',
+        insuranceName: '洋洋得意險',
+        category: '旅遊輕裝',
+        icon: '🥔',
+        basePrice: 15,
+        tag: '防出遊跌倒/誤點',
+        ingredient: '出遊跌倒、行程延誤、相機摔裂',
+        medical: '醫療實支實付 NT$ 30,000',
+        bonus: '延誤 3 小時慰問金 NT$ 3,000',
+        speed: '拍照上傳 15 分鐘核銷'
+      },
+      {
+        id: 'A2',
+        name: '防護軟糖',
+        insuranceName: '突發微恙健康錠',
+        category: '日常健康',
+        icon: '🍬',
+        basePrice: 12,
+        tag: '感冒發燒/水土不服',
+        ingredient: '急診掛號、水土不服、突發發燒',
+        medical: '急診與門診定額 NT$ 15,000',
+        bonus: '突發急診交通補助 NT$ 1,200',
+        speed: '診斷證明秒級 AI 審核'
+      },
+      {
+        id: 'B1',
+        name: '硬骨頭仙貝',
+        insuranceName: '極限運動骨折險',
+        category: '運動冒險',
+        icon: '🍘',
+        basePrice: 20,
+        tag: '滑雪/攀岩/球類受傷',
+        ingredient: '高強度運動挫傷、韌帶拉傷、骨折補償',
+        medical: '骨折未住院津貼 NT$ 40,000',
+        bonus: '運動器材損壞補助 NT$ 5,000',
+        speed: 'X光片即時判定快速撥款'
+      },
+      {
+        id: 'B2',
+        name: '保心黑巧克力',
+        insuranceName: '爆肝熬夜抗壓包',
+        category: '職場防護',
+        icon: '🍫',
+        basePrice: 18,
+        tag: '熬夜趕工/心力交瘁',
+        ingredient: '心血管突發微恙、高壓心靈慰問、連假泡湯補償',
+        medical: '急診心律觀察津貼 NT$ 25,000',
+        bonus: '專案延宕心理諮詢補助 NT$ 3,500',
+        speed: '打卡工時異常秒發慰問金'
+      },
+      {
+        id: 'C1',
+        name: '破壁爆米花',
+        insuranceName: '手滑打破責任險',
+        category: '生活手滑',
+        icon: '🍿',
+        basePrice: 10,
+        tag: '打破名瓷/路人咖啡',
+        ingredient: '手滑碰倒展品、咖啡打翻他人筆電、毛孩闖禍',
+        medical: '個人過失責任理賠 NT$ 100,000',
+        bonus: '緊急和解金 NT$ 6,000',
+        speed: '現場錄影一鍵上傳仲裁'
+      },
+      {
+        id: 'C2',
+        name: '逆風跳跳糖',
+        insuranceName: '海島冒險水上險',
+        category: '極限水上',
+        icon: '⚡',
+        basePrice: 22,
+        tag: '衝浪/潛水/溯溪救援',
+        ingredient: '水上運動嗆水、珊瑚礁刮傷、緊急搜救',
+        medical: '直升機/水上搜救費用 NT$ 150,000',
+        bonus: '浮潛裝備遺失補貼 NT$ 4,000',
+        speed: '衛星定位緊急搜救連線'
+      }
+    ];
+
+    /* ================= 2. 狀態管理 (State) ================= */
+    let currentSelectedId = 'A1';
+    let userBalance = 100;
+    let keypadBuffer = '';
+    let isSoundEnabled = true;
+
+    // 客製調味加料狀態
+    let seasonings = {
+      spicy: false,  // +5
+      cheese: false, // +8
+      garlic: false  // +6
+    };
+    let durationMultiplier = 1; // 1天, 3天, 7天
+    let durationDays = 1;
+
+    // 掉落在取貨口的商品
+    let pendingDroppedProduct = null;
+
+    /* ================= 3. Web Audio API 音效引擎 (免外部音檔) ================= */
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // 投幣金屬清脆敲擊音
+    function playCoinSound() {
+      if (!isSoundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, now); // B5
+        osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.08); // E6
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } catch (e) {
+        console.warn("Audio play prevented:", e);
+      }
+    }
+
+    // 按鍵點擊嗶聲
+    function playBeepSound(freq = 600) {
+      if (!isSoundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // 零食掉落低音咚（重力撞擊聲）
+    function playDropSound() {
+      if (!isSoundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        
+        // 第一次彈跳
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(45, now + 0.25);
+
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.3);
+
+        // 第二次小回音
+        setTimeout(() => {
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(120, ctx.currentTime);
+          osc2.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.15);
+          gain2.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.start();
+          osc2.stop(ctx.currentTime + 0.15);
+        }, 120);
+
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // 結帳成功勝利和弦 (Chime)
+    function playSuccessChime() {
+      if (!isSoundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const now = ctx.currentTime + idx * 0.08;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.45);
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    /* ================= 4. 畫面渲染與初始化 ================= */
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMachineGrid();
+      updateSelectedProduct(currentSelectedId);
+      updateWalletDisplay();
+
+      // 音效開關切換
+      const audioBtn = document.getElementById('audioToggleBtn');
+      audioBtn.addEventListener('click', () => {
+        isSoundEnabled = !isSoundEnabled;
+        audioBtn.textContent = isSoundEnabled ? '🔊' : '🔇';
+        showToast(isSoundEnabled ? '音效已開啟 🔔' : '已切換為靜音模式 🔕');
+      });
+
+      // 投幣按鈕
+      document.getElementById('insertCoinBtn').addEventListener('click', () => {
+        userBalance += 50;
+        playCoinSound();
+        updateWalletDisplay();
+        setLedMessage(`+$50 INSERTED!`);
+        showToast('🪙 投入硬幣 NT$ 50！餘額充裕');
+      });
+    });
+
+    // 渲染販賣機櫥窗內的 6 款零食
+    function renderMachineGrid() {
+      const grid = document.getElementById('machineGrid');
+      grid.innerHTML = '';
+
+      SNACK_PRODUCTS.forEach(p => {
+        const slot = document.createElement('div');
+        slot.className = `snack-slot ${p.id === currentSelectedId ? 'selected' : ''}`;
+        slot.id = `slot-${p.id}`;
+        slot.onclick = () => selectSnack(p.id);
+
+        slot.innerHTML = `
+          <div class="slot-code">${p.id}</div>
+          <div class="slot-icon">${p.icon}</div>
+          <div class="slot-name">${p.name}</div>
+          <div class="slot-tag">${p.insuranceName}</div>
+          <div class="slot-price">NT$ ${p.basePrice}/日</div>
+        `;
+
+        grid.appendChild(slot);
+      });
+    }
+
+    // 選擇零食 (點擊櫥窗)
+    function selectSnack(id) {
+      playBeepSound(700);
+      currentSelectedId = id;
+
+      // 更新選中外觀
+      document.querySelectorAll('.snack-slot').forEach(s => s.classList.remove('selected'));
+      const activeSlot = document.getElementById(`slot-${id}`);
+      if (activeSlot) activeSlot.classList.add('selected');
+
+      // 更新右側面板
+      updateSelectedProduct(id);
+      setLedMessage(`SEL: ${id}`);
+    }
+
+    // 更新右側營養標籤與價格計算
+    function updateSelectedProduct(id) {
+      const product = SNACK_PRODUCTS.find(p => p.id === id);
+      if (!product) return;
+
+      document.getElementById('panelTitle').textContent = `${product.id}. ${product.name} (${product.insuranceName})`;
+      document.getElementById('nutriCalories').textContent = `NT$ ${product.basePrice} / 日`;
+      document.getElementById('nutriIngredient').textContent = product.ingredient;
+      document.getElementById('nutriMedical').textContent = product.medical;
+      document.getElementById('nutriBonus').textContent = product.bonus;
+      document.getElementById('nutriSpeed').textContent = product.speed;
+
+      calculateTotalPrice();
+    }
+
+    // 計算總價
+    function calculateTotalPrice() {
+      const product = SNACK_PRODUCTS.find(p => p.id === currentSelectedId);
+      if (!product) return 15;
+
+      let base = product.basePrice * durationMultiplier;
+      let addon = 0;
+      if (seasonings.spicy) addon += 5 * durationMultiplier;
+      if (seasonings.cheese) addon += 8 * durationMultiplier;
+      if (seasonings.garlic) addon += 6 * durationMultiplier;
+
+      const total = base + addon;
+      document.getElementById('totalCostSpan').textContent = total;
+      return total;
+    }
+
+    // 切換客製調味
+    function toggleSeasoning(type) {
+      playBeepSound(550);
+      seasonings[type] = !seasonings[type];
+      
+      const pill = document.getElementById(`opt${capitalize(type)}`);
+      if (pill) {
+        pill.classList.toggle('active', seasonings[type]);
+      }
+      calculateTotalPrice();
+    }
+
+    function capitalize(s) {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    // 選擇保障天數
+    function selectDuration(days, elem) {
+      playBeepSound(650);
+      durationDays = days;
+      durationMultiplier = days === 1 ? 1 : (days === 3 ? 2.5 : 5.5); // 週末與長期有份量優惠
+
+      document.querySelectorAll('.duration-chip').forEach(c => c.classList.remove('active'));
+      elem.classList.add('active');
+
+      calculateTotalPrice();
+    }
+
+    // LED 與錢包介面更新
+    function setLedMessage(msg) {
+      const led = document.getElementById('ledScreen');
+      led.textContent = msg;
+    }
+
+    function updateWalletDisplay() {
+      document.getElementById('ledWallet').textContent = `餘額 $${userBalance}`;
+    }
+
+    // 實體鍵盤操作
+    function pressKey(key) {
+      playBeepSound(800);
+
+      if (key === 'CLR') {
+        keypadBuffer = '';
+        setLedMessage(`READY: A1-C2`);
+        return;
+      }
+
+      if (key === 'ENT') {
+        if (keypadBuffer.length > 0) {
+          const match = SNACK_PRODUCTS.find(p => p.id.toUpperCase() === keypadBuffer.toUpperCase());
+          if (match) {
+            selectSnack(match.id);
+            setLedMessage(`OK: ${match.name}`);
+            showToast(`已鎖定商品 ${match.id} ${match.name}`);
+          } else {
+            setLedMessage(`ERR: 無此品項`);
+            showToast('⚠️ 找不到該編號，請輸入 A1 至 C2');
+          }
+          keypadBuffer = '';
+        }
+        return;
+      }
+
+      if (keypadBuffer.length < 2) {
+        keypadBuffer += key;
+        setLedMessage(`IN: ${keypadBuffer}`);
+      }
+    }
+
+    /* ================= 5. 出貨與開箱核心流程 (Vending & Unboxing) ================= */
+    function vendCurrentProduct() {
+      const product = SNACK_PRODUCTS.find(p => p.id === currentSelectedId);
+      const cost = calculateTotalPrice();
+
+      if (userBalance < cost) {
+        setLedMessage(`餘額不足！請投幣`);
+        showToast(`❌ 餘額不足 NT$ ${cost}，請點擊投幣口加值！`);
+        playBeepSound(300);
+        return;
+      }
+
+      // 扣款
+      userBalance -= cost;
+      updateWalletDisplay();
+      setLedMessage(`VENDING...`);
+
+      // 貨道馬達轉動模擬，隨後零食掉落「咚」
+      setTimeout(() => {
+        playDropSound();
+        triggerDoorDrop(product, cost);
+        setLedMessage(`COLLECT ITEM ▾`);
+        showToast(`🎁 商品已掉落至取貨口！請點擊取出`);
+      }, 700);
+    }
+
+    // 取貨口開門與掉落動畫
+    function triggerDoorDrop(product, cost) {
+      const door = document.getElementById('pickupDoor');
+      const droppedBox = document.getElementById('droppedItem');
+      const droppedIcon = document.getElementById('droppedIcon');
+      const droppedText = document.getElementById('droppedText');
+
+      pendingDroppedProduct = {
+        ...product,
+        totalCost: cost,
+        holderName: document.getElementById('policyHolderName').value || '快樂旅人',
+        hasRealGift: document.getElementById('realSnackBundle').checked,
+        seasoningDetails: { ...seasonings },
+        durationDays: durationDays
+      };
+
+      droppedIcon.textContent = product.icon;
+      droppedText.textContent = `點擊開箱：${product.name}`;
+
+      // 開門顯示物品
+      door.classList.add('open');
+      droppedBox.style.display = 'flex';
+    }
+
+    // 使用者點擊取貨口拿出商品
+    function inspectDroppedItem() {
+      if (!pendingDroppedProduct) {
+        showToast('📦 取貨口目前是空的，請先挑選商品投幣！');
+        return;
+      }
+
+      playSuccessChime();
+
+      // 重置取貨口
+      const door = document.getElementById('pickupDoor');
+      const droppedBox = document.getElementById('droppedItem');
+      door.classList.remove('open');
+      droppedBox.style.display = 'none';
+
+      // 彈出數位保單卡片
+      openPolicyModal(pendingDroppedProduct);
+      pendingDroppedProduct = null;
+      setLedMessage(`THANK YOU!`);
+    }
+
+    // 展開保單彈窗
+    function openPolicyModal(item) {
+      const modal = document.getElementById('policyModal');
+      document.getElementById('modalBadge').textContent = item.icon;
+      document.getElementById('modalProductName').textContent = `${item.name} (${item.insuranceName})`;
+      document.getElementById('modalHolder').textContent = item.holderName;
+      document.getElementById('modalDate').textContent = `即刻生效，保障期 ${item.durationDays} 天`;
+      document.getElementById('modalPrice').textContent = `NT$ ${item.totalCost} (微型極簡保費)`;
+      
+      // 贈品
+      const bonusEl = document.getElementById('modalBonusGift');
+      if (item.hasRealGift) {
+        bonusEl.textContent = '超商 5 元零食現折序號 #VIBE-SNACK-888';
+      } else {
+        bonusEl.textContent = '純保險微包裝方案';
+      }
+
+      // 保障細節清單
+      const list = document.getElementById('modalCoverageList');
+      list.innerHTML = `
+        <div class="policy-coverage-item">🛡️ 主要責任：${item.ingredient}</div>
+        <div class="policy-coverage-item">🏥 醫療給付：${item.medical}</div>
+        <div class="policy-coverage-item">⚡ 慰問津貼：${item.bonus}</div>
+      `;
+
+      if (item.seasoningDetails.spicy) {
+        list.innerHTML += `<div class="policy-coverage-item" style="color: #dc2626;">🌶️ 附加：意外保額雙倍調味 (+100%)</div>`;
+      }
+      if (item.seasoningDetails.cheese) {
+        list.innerHTML += `<div class="policy-coverage-item" style="color: #d97706;">🧀 附加：行程延誤與不便升級條款</div>`;
+      }
+      if (item.seasoningDetails.garlic) {
+        list.innerHTML += `<div class="policy-coverage-item" style="color: #16a34a;">🧄 附加：門診急診實支實付加倍</div>`;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('policyModal').classList.remove('active');
+      showToast('🎉 保單已生效存入你的背包！祝你冒險順利！');
+    }
+
+    function sharePolicyCard() {
+      playBeepSound(900);
+      showToast('📸 已為您生成 IG 限時動態格式分享圖！已複製分享標籤！');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText("我剛剛在 SnackSure 買了超可愛的【零食微保險】！安全感滿分 🍿⚡");
+      }
+    }
+
+    /* ================= 6. 功能切換 (Tabs) ================= */
+    function switchTab(tabId) {
+      playBeepSound(600);
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('detailPanel').style.display = 'none';
+      document.getElementById('quizPanel').style.display = 'none';
+      document.getElementById('gachaPanel').style.display = 'none';
+
+      if (tabId === 'detail') {
+        document.getElementById('tabDetail').classList.add('active');
+        document.getElementById('detailPanel').style.display = 'block';
+      } else if (tabId === 'quiz') {
+        document.getElementById('tabQuiz').classList.add('active');
+        document.getElementById('quizPanel').style.display = 'block';
+      } else if (tabId === 'gacha') {
+        document.getElementById('tabGacha').classList.add('active');
+        document.getElementById('gachaPanel').style.display = 'block';
+      }
+    }
+
+    /* ================= 7. AI 推薦師測驗 (Quiz Engine) ================= */
+    let quizAnswers = {
+      q1: 'A1',
+      q2: 'delay'
+    };
+
+    function selectQuizOpt(qNum, value, btn) {
+      playBeepSound(750);
+      quizAnswers[`q${qNum}`] = value;
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    function calculateQuizRecommendation() {
+      playSuccessChime();
+      let targetId = 'A1';
+
+      if (quizAnswers.q1 === 'B2' || quizAnswers.q2 === 'stress') {
+        targetId = 'B2'; // 黑巧克力
+      } else if (quizAnswers.q1 === 'B1') {
+        targetId = 'B1'; // 硬骨頭仙貝
+      } else if (quizAnswers.q1 === 'C1' || quizAnswers.q2 === 'clumsy') {
+        targetId = 'C1'; // 爆米花
+      } else if (quizAnswers.q2 === 'health') {
+        targetId = 'A2'; // 軟糖
+      } else {
+        targetId = 'A1'; // 洋芋片
+      }
+
+      switchTab('detail');
+      selectSnack(targetId);
+      showToast(`🎯 AI 零食推薦師已為您配對專屬商品：${targetId}！`);
+    }
+
+    /* ================= 8. 幸運扭蛋盲盒 (Gacha Engine) ================= */
+    function triggerGacha() {
+      if (userBalance < 20) {
+        setLedMessage(`餘額不足 $20`);
+        showToast('❌ 盲盒扭蛋需要 NT$ 20，請先按 +$50 投幣！');
+        playBeepSound(300);
+        return;
+      }
+
+      userBalance -= 20;
+      updateWalletDisplay();
+      playCoinSound();
+
+      // 旋轉動畫
+      const gachaIcon = document.getElementById('gachaIcon');
+      gachaIcon.style.transform = 'rotate(720deg) scale(1.3)';
+      gachaIcon.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      setLedMessage(`SPINNING...`);
+
+      setTimeout(() => {
+        gachaIcon.style.transform = '';
+        // 隨機抽取一款零食
+        const randomIndex = Math.floor(Math.random() * SNACK_PRODUCTS.length);
+        const randomProduct = SNACK_PRODUCTS[randomIndex];
+
+        // 盲盒自動附贈加辣調味
+        seasonings.spicy = true;
+        document.getElementById('optSpicy').classList.add('active');
+
+        switchTab('detail');
+        selectSnack(randomProduct.id);
+        vendCurrentProduct();
+        showToast(`✨ 恭喜抽中隱藏盲盒：${randomProduct.name}（已自動升級雙倍保額）！`);
+      }, 800);
+    }
+
+    /* ================= 9. 提示吐司 (Toast Message) ================= */
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
